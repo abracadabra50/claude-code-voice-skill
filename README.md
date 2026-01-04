@@ -43,7 +43,7 @@ pip install claude-code-voice
 
 ### From source
 ```bash
-git clone https://github.com/abracadabra50/claude-code-voice.git
+git clone https://github.com/anthropics/claude-code-voice.git
 cd claude-code-voice
 pip install -e .
 ```

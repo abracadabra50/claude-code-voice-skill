@@ -9,9 +9,7 @@ description = "Talk to Claude about your projects over the phone"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.8"
-authors = [
-    { name = "Zishan", email = "zishan@example.com" }
-]
+authors = []
 keywords = ["claude", "voice", "ai", "coding", "vapi"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -39,9 +37,9 @@ dev = [
 claude-code-voice = "claude_voice.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/abracadabra50/claude-code-voice"
-Repository = "https://github.com/abracadabra50/claude-code-voice"
-Issues = "https://github.com/abracadabra50/claude-code-voice/issues"
+Homepage = "https://github.com/anthropics/claude-code-voice"
+Repository = "https://github.com/anthropics/claude-code-voice"
+Issues = "https://github.com/anthropics/claude-code-voice/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/claude_voice"]

@@ -69,7 +69,7 @@ def get_vapi_key() -> str:
     key = os.environ.get("VAPI_API_KEY") or config.get("vapi_api_key")
     if not key:
         print("ERROR: No Vapi API key configured")
-        print("Run: claude-voice setup")
+        print("Run: claude-code-voice setup")
         sys.exit(1)
     return key
 
@@ -179,8 +179,8 @@ def cmd_setup(args):
     print(f"Your phone: {config.get('user_phone', 'Not set')}")
     print(f"Vapi number: {config.get('vapi_phone_number', 'Not set')}")
     print("\nNext steps:")
-    print("  1. Run 'claude-voice register' in a project directory")
-    print("  2. Run 'claude-voice call' to have Claude call you")
+    print("  1. Run 'claude-code-voice register' in a project directory")
+    print("  2. Run 'claude-code-voice call' to have Claude call you")
 
 
 def create_tools(config: dict) -> dict:
@@ -293,7 +293,7 @@ def cmd_register(args):
     print(f"Recent files: {len(context.get('recent_files', []))} files")
 
     print(f"\n✅ Project registered: {project_file}")
-    print(f"\nYou can now run 'claude-voice call' to have Claude call you.")
+    print(f"\nYou can now run 'claude-code-voice call' to have Claude call you.")
 
 
 def gather_project_context(project_path: Path) -> dict:
@@ -404,15 +404,15 @@ def cmd_call(args):
     config = load_config()
 
     if not config.get("vapi_api_key"):
-        print("ERROR: Run 'claude-voice setup' first")
+        print("ERROR: Run 'claude-code-voice setup' first")
         sys.exit(1)
 
     if not config.get("user_phone"):
-        print("ERROR: No phone number configured. Run 'claude-voice setup'")
+        print("ERROR: No phone number configured. Run 'claude-code-voice setup'")
         sys.exit(1)
 
     if not config.get("vapi_phone_number_id"):
-        print("ERROR: No Vapi phone number configured. Run 'claude-voice setup'")
+        print("ERROR: No Vapi phone number configured. Run 'claude-code-voice setup'")
         sys.exit(1)
 
     cwd = Path.cwd()
@@ -568,7 +568,7 @@ def cmd_sync(args):
     config = load_config()
 
     if not config.get("vapi_api_key"):
-        print("ERROR: Run 'claude-voice setup' first")
+        print("ERROR: Run 'claude-code-voice setup' first")
         sys.exit(1)
 
     print("=== Syncing Call Transcripts ===\n")
@@ -690,7 +690,7 @@ def cmd_list(args):
 
     if not projects:
         print("No projects registered.")
-        print("Run 'claude-voice register' in a project directory.")
+        print("Run 'claude-code-voice register' in a project directory.")
         return
 
     for pf in projects:
@@ -742,9 +742,19 @@ def cmd_server(args):
 # MAIN
 # ============================================================================
 
+COMMANDS = {"setup", "register", "call", "sync", "history", "list", "status", "server"}
+
+
 def main():
+    # Handle slash-command style: /call "topic" -> claude-code-voice "topic"
+    # If first arg is not a known command, treat it as a call topic
+    if len(sys.argv) > 1 and sys.argv[1] not in COMMANDS and not sys.argv[1].startswith("-"):
+        # Treat all args as call topic
+        topic = " ".join(sys.argv[1:])
+        sys.argv = [sys.argv[0], "call", topic]
+
     parser = argparse.ArgumentParser(
-        description="Claude Voice - Talk to Claude about your projects over the phone"
+        description="Claude Code Voice - Talk to Claude about your projects over the phone"
     )
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
@@ -800,7 +810,10 @@ def main():
     elif args.command == "server":
         cmd_server(args)
     else:
-        cmd_status(args)
+        # No command = make a call
+        class FakeArgs:
+            topic = None
+        cmd_call(FakeArgs())
 
 
 if __name__ == "__main__":
