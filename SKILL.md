@@ -7,51 +7,78 @@ user-invocable: true
 
 # /call
 
-Voice conversations with Claude about your projects. Call a phone number to brainstorm, or have Claude call you with updates.
+Voice conversations with Claude about your projects.
 
-## Usage
-
-```
-/call                      # Claude calls you about current project
-/call "discuss the auth"   # Call with specific topic
-/call register             # Register current project for calls
-/call sync                 # Pull transcripts from Vapi
-/call status               # Show configuration status
-```
-
-## Setup
-
-1. Install: `pip install claude-code-voice` or symlink this to `~/.claude/skills/call`
-2. Run `claude-code-voice setup` to configure Vapi credentials
-3. Register projects with `claude-code-voice register`
-
-## How It Works
-
-When you invoke `/call`, Claude:
-1. Gathers project context (git status, todos, recent files)
-2. Captures current Claude Code session context
-3. Creates a transient Vapi voice assistant with full context
-4. Calls your phone number
-5. Converses naturally about your project
-6. Can read files and search code live during the call
-
-## Context Server (Optional)
-
-For live file reading during calls:
+## Quick Reference
 
 ```bash
-# Terminal 1: Start server
-claude-code-voice server
-
-# Terminal 2: Create tunnel
-npx localtunnel --port 8765
-# Outputs: https://abc123.loca.lt
-
-# Terminal 3: Configure (auto-updates Vapi tools)
-claude-code-voice config server-url https://abc123.loca.lt
+claude-code-voice call "topic"              # Make a call
+claude-code-voice status                    # Check setup status
+claude-code-voice config server-url <url>   # Set context server URL
 ```
 
-## Requirements
+## Before Making a Call
 
-- Vapi account with phone number
-- Python 3.8+
+Always check status first:
+```bash
+claude-code-voice status
+```
+
+This shows:
+- `API Key: ✅ Set` - Vapi configured
+- `Your Phone: +1...` - User's phone number
+- `Vapi Number: +1...` - Outbound caller ID
+- `Server URL: https://...` - Context server (optional, for live file access)
+- `Tools: 4 configured` - Vapi tools ready
+
+### If Not Set Up
+
+Run interactive setup:
+```bash
+claude-code-voice setup
+```
+
+User needs:
+1. Vapi API key from https://dashboard.vapi.ai
+2. Their phone number
+3. A Vapi phone number (purchased in dashboard)
+
+### If "Server URL: ❌ Not set"
+
+This is optional. Without it, calls work but can't read files live. To enable:
+
+```bash
+# Terminal 1
+claude-code-voice server
+
+# Terminal 2
+npx localtunnel --port 8765
+# Copy the https://xxx.loca.lt URL
+
+# Then run:
+claude-code-voice config server-url https://xxx.loca.lt
+```
+
+## Making Calls
+
+```bash
+# Call about current project
+claude-code-voice call
+
+# Call with specific topic
+claude-code-voice call "let's debug the auth flow"
+
+# Short form (if installed as skill)
+claude-code-voice "discuss the API design"
+```
+
+## Troubleshooting
+
+### "Cannot access files during call"
+Server URL not configured. Run `claude-code-voice config server-url <tunnel-url>` after starting server + tunnel.
+
+### "Vapi API error 400"
+Usually means setup incomplete. Run `claude-code-voice setup` again.
+
+### Call doesn't connect
+Check `claude-code-voice status` - verify phone numbers are set and Vapi number exists.
