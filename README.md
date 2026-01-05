@@ -2,7 +2,7 @@
 
 > **Voice conversations with Claude Opus 4.5 about your code.**
 
-Talk through problems, brainstorm ideas, or get a code review - all over the phone.
+Talk through problems, brainstorm ideas, or get a code review — all over the phone.
 
 ## Quick Start
 
@@ -10,20 +10,28 @@ Talk through problems, brainstorm ideas, or get a code review - all over the pho
 # Install
 pip install claude-code-voice
 
-# One-time setup (need Vapi account: https://dashboard.vapi.ai)
+# One-time setup
 claude-code-voice setup
 
 # Register a project
 cd your-project
 claude-code-voice register
 
-# Start the service
+# Start everything (server + tunnel + config)
 claude-code-voice start
 ```
 
-Now you can:
+That's it! Now you can:
 - **Have Claude call you**: `claude-code-voice call "debug the auth flow"`
 - **Call Claude**: Dial your Vapi number and Claude answers with your project loaded
+
+## What You Need
+
+Before running setup:
+1. **Vapi account** — https://vapi.ai (free to sign up)
+2. **Vapi API key** — https://dashboard.vapi.ai/api-keys
+3. **Vapi phone number** — https://dashboard.vapi.ai/phone-numbers (~$2/month)
+4. **Node.js** — for localtunnel
 
 ## Features
 
@@ -31,27 +39,23 @@ Now you can:
 |---------|-------------|
 | **Opus 4.5** | Best-in-class reasoning for technical discussions |
 | **Project context** | Git status, recent files, todos loaded automatically |
-| **Live tools** | Claude can read files and search code during calls |
+| **Live tools** | Claude reads files and searches code during calls |
 | **Auto-transcripts** | Every call saved as markdown |
 | **Personalized** | Claude greets you by name |
+| **Inbound calls** | Call your number and Claude answers |
 
 ## Commands
 
 ```bash
 claude-code-voice setup              # Configure API key, phone, name
 claude-code-voice register           # Register current project
-claude-code-voice start              # Start server + tunnel (easy mode)
+claude-code-voice start              # Start server + tunnel (recommended)
 claude-code-voice call [topic]       # Have Claude call you
 claude-code-voice status             # Check configuration
 claude-code-voice config name <name> # Update your name
+claude-code-voice config show        # Show all config
+claude-code-voice history            # View past calls
 ```
-
-## Requirements
-
-- Python 3.8+
-- [Vapi](https://vapi.ai) account with API key
-- Vapi phone number (~$2/month)
-- Node.js (for localtunnel)
 
 ## How It Works
 
@@ -61,21 +65,80 @@ You ──call──▶ Vapi Phone ──webhook──▶ Your Server ──cont
                                       reads your code
 ```
 
-1. **Setup** stores your Vapi credentials
+1. **Setup** stores your Vapi credentials and creates tools
 2. **Register** snapshots project context (git, files, todos)
-3. **Start** runs server + tunnel, configures Vapi
-4. **Call** - Claude has full context about your project
+3. **Start** runs server + tunnel, auto-configures Vapi
+4. **Call** — Claude has full context about your project
+
+## The `start` Command
+
+The `start` command is the easiest way to get everything running:
+
+```bash
+claude-code-voice start
+```
+
+It automatically:
+- Kills any existing server on port 8765
+- Starts the context server
+- Starts localtunnel and waits for URL
+- Updates all Vapi tools with the new URL
+- Configures inbound call webhooks
+- Shows your Vapi number for inbound calls
+
+Just keep that terminal open and you're ready for calls.
+
+## Transcripts
+
+Transcripts auto-save to `~/.claude/skills/call/data/transcripts/` when calls end.
+
+Each transcript includes:
+- Full conversation
+- AI-generated summary
+- Call metadata (duration, project, topic)
+
+## Troubleshooting
+
+### "Connection issues" or "404 errors"
+Run `claude-code-voice start` — it auto-configures everything when the tunnel URL changes.
+
+### "I don't recognize this number"
+Call from the phone number you used during setup.
+
+### Claude can't read files during call
+Make sure `claude-code-voice start` is running in a terminal.
+
+### Check your configuration
+```bash
+claude-code-voice status
+```
 
 ## As a Claude Code Skill
 
-For `/call` in Claude Code:
+For `/call` directly in Claude Code:
 
 ```bash
 git clone https://github.com/abracadabra50/claude-code-voice-skill.git
 ln -s /path/to/claude-code-voice-skill ~/.claude/skills/call
 ```
 
-Then use `/call` directly in conversations.
+Then use `/call` in conversations.
+
+## Manual Setup (Advanced)
+
+If you prefer manual control over the server and tunnel:
+
+```bash
+# Terminal 1: Start server
+claude-code-voice server
+
+# Terminal 2: Start tunnel
+npx localtunnel --port 8765
+
+# Terminal 3: Configure (run after each tunnel restart)
+claude-code-voice config server-url https://xxx.loca.lt
+claude-code-voice configure-inbound
+```
 
 ## License
 
