@@ -1,13 +1,13 @@
 ---
 name: call
-description: Voice conversations with Claude about your projects. Call a phone number to brainstorm, or have Claude call you with updates.
+description: Voice calls with Claude about your coding projects via Vapi. Use when you want to phone Claude, start a voice conversation, dial in for a project brainstorm, get a verbal status update, or talk through code hands-free.
 allowed-tools: Bash, Read, Write, AskUserQuestion
 user-invocable: true
 ---
 
 # /call
 
-Voice conversations with Claude (Opus 4.5) about your projects.
+Voice calls with Claude about your projects. Claude calls you (outbound) or you call a Vapi number and Claude answers with your project context preloaded — read files, search code, check git status, and brainstorm live.
 
 ## Quick Start
 
@@ -15,6 +15,7 @@ Voice conversations with Claude (Opus 4.5) about your projects.
 # One-time setup
 pip install claude-code-voice
 claude-code-voice setup              # Add API key, phone, name
+claude-code-voice status             # Verify configuration is correct
 
 # Register a project
 cd your-project
